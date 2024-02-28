@@ -1,38 +1,34 @@
 'use strict';
-const express = require('express');
-const bcrypt = require('bcrypt');
-const app = express();
-const bodyParser = require('body-parser');
+const express     = require('express');
+const bodyParser  = require('body-parser');
+const fccTesting  = require('./freeCodeCamp/fcctesting.js');
+const bcrypt= require('bcrypt');
+const app         = express();
+fccTesting(app);
+const saltRounds = 12;
+const myPlaintextPassword = 'sUperpassw0rd!';
+const someOtherPlaintextPassword = 'pass123';
 
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.post('/hash', (req, res) => {
-  const myPlaintextPassword = req.body.password;
-  const saltRounds = 13;
-
-  // Hash the password asynchronously
-  bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
-    if (err) {
-      console.error('Error hashing password:', err);
-      res.status(500).send('Internal Server Error');
-    } else {
-      // Log the completed hash to the console
-      console.log('Hashed Password:', hash);
-
-      // Compare the hashed password with a new input
-      bcrypt.compare(myPlaintextPassword, hash, (err, compareResult) => {
-        if (err) {
-          console.error('Error comparing passwords:', err);
-          res.status(500).send('Internal Server Error');
-        } else {
-          // Log the comparison result to the console
-          console.log('Comparison Result:', compareResult);
-          res.send('Hashed and compared successfully!');
-        }
-      });
-    }
-  });
+app.get('/', (req, res) => {
+    res.send("Hello World!");
 });
+//START_ASYNC -do not remove notes, place code between correct pair of notes.
+bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
+    console.log(hash);
+    bcrypt.compare(myPlaintextPassword, hash,(err, res) => {
+        console.log(res);
+    
+    });
+});
+
+
+
+//END_ASYNC
+
+//START_SYNC
+
+
+
 //END_SYNC
 
 
@@ -63,7 +59,7 @@ app.post('/hash', (req, res) => {
 
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("Listening on port:", PORT)
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log("Listening on port:", port)
 });
