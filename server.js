@@ -1,22 +1,38 @@
 'use strict';
-const express     = require('express');
-const bodyParser  = require('body-parser');
+const express = require('express');
 const bcrypt = require('bcrypt');
-const fccTesting  = require('./freeCodeCamp/fcctesting.js');
-const app         = express();
-fccTesting(app);
-const saltRounds = 12;
-const myPlaintextPassword = 'sUperpassw0rd!';
-const someOtherPlaintextPassword = 'pass123';
+const app = express();
+const bodyParser = require('body-parser');
 
-bcrypt.hash('passw0rd!', 13, (err, hash) => {
-    console.log(hash);
-    //$2a$12$Y.PHPE15wR25qrrtgGkiYe2sXo98cjuMCG1YwSI5rJW1DSJp0gEYS
-    bcrypt.compare('passw0rd!', hash, (err, res) => {
-      console.log(res); //true
-    });
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.post('/hash', (req, res) => {
+  const myPlaintextPassword = req.body.password;
+  const saltRounds = 13;
+
+  // Hash the password asynchronously
+  bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      // Log the completed hash to the console
+      console.log('Hashed Password:', hash);
+
+      // Compare the hashed password with a new input
+      bcrypt.compare(myPlaintextPassword, hash, (err, compareResult) => {
+        if (err) {
+          console.error('Error comparing passwords:', err);
+          res.status(500).send('Internal Server Error');
+        } else {
+          // Log the comparison result to the console
+          console.log('Comparison Result:', compareResult);
+          res.send('Hashed and compared successfully!');
+        }
+      });
+    }
   });
-  
+});
 //END_SYNC
 
 
